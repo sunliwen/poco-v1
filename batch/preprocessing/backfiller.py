@@ -27,7 +27,7 @@ class BackFiller:
             connection, site_id, "tmp_user_identified_logs_plo")
         self.last_ts = last_ts
         self.output_file_path = output_file_path
-        self.tjbid2user = {}
+        self.ptm_id2user = {}
 
     def dateTimeAsFloat(self, datetime):
         return time.mktime(datetime.timetuple()) + datetime.microsecond / 1000000.0
@@ -43,19 +43,19 @@ class BackFiller:
 
     # TODO: maybe use atomic update later?
     def workOnDoc(self, log_doc, is_old_region):
-        if log_doc.has_key("tjbid"):
+        if log_doc.has_key("ptm_id"):
             user_id = log_doc.get("user_id", "null")
             if not is_old_region and user_id != "null":
-                self.tjbid2user[log_doc["tjbid"]] = user_id
+                self.ptm_id2user[log_doc["ptm_id"]] = user_id
             if log_doc.get("filled_user_id", None) is None \
                     or log_doc["filled_user_id"].startswith("ANO_"):
                 if user_id == "null":
-                    if self.tjbid2user.has_key(log_doc["tjbid"]):
+                    if self.ptm_id2user.has_key(log_doc["ptm_id"]):
                         self._updateFilledUserId(
-                            log_doc, self.tjbid2user[log_doc["tjbid"]])
+                            log_doc, self.ptm_id2user[log_doc["ptm_id"]])
                     else:
                         self._updateFilledUserId(
-                            log_doc, "ANO_" + log_doc["tjbid"])
+                            log_doc, "ANO_" + log_doc["ptm_id"])
                 else:
                     self._updateFilledUserId(log_doc, user_id)
                 self.raw_logs.save(log_doc)

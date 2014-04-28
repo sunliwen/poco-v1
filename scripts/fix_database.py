@@ -28,7 +28,7 @@ if False:
                     {"$set": {"timestamp": float(row["timestamp"][:-2])}})
             if row.has_key("tuijianbaoid"):
                 raw_logs.update(row,
-                    {"$set": {"tjbid": row["tuijianbaoid"]}})
+                    {"$set": {"ptm_id": row["tuijianbaoid"]}})
             if not row.has_key("order_id"):
                 raw_logs.update(row,
                     {"$set": {"order_id": None}})

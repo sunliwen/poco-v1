@@ -1124,6 +1124,8 @@ handlers = [
 
 
 def main():
+    print "The tornado based api server is outdated in Poco 1.6. Please use the new Django based server."
+    sys.exit(1)
     opts, _ = getopt.getopt(sys.argv[1:], 'p:', ['port='])
     port = settings.server_port
     for o, p in opts:

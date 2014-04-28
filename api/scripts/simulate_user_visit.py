@@ -26,6 +26,8 @@ def api_access(path, params, tuijianbaoid=None, as_json=True):
     else:
         return result
 
+print "This script is outdated. (For example, the handling of tjbid)"
+sys.exit(1)
 count = 0
 for line in open(file_name, "r"):
     count += 1

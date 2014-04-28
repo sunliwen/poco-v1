@@ -12,5 +12,5 @@ def getDateStr(timestamp):
 
 
 for line in sys.stdin:
-    created_on, filled_user_id, behavior, tjbid, item_id = line.strip().split('\t')
+    created_on, filled_user_id, behavior, ptm_id, item_id = line.strip().split('\t')
     print '\t'.join((behavior, getDateStr(float(created_on)), item_id))

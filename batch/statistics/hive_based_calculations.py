@@ -180,7 +180,7 @@ def convert_backfilled_raw_logs(work_dir, backfilled_raw_logs_path):
         uniq_order_id = row.get("uniq_order_id", "0")
         order_id = row.get("order_id", "0")
         output = [date_str, repr(hour), repr(row["created_on"]), uniq_order_id, order_id,
-                  row["filled_user_id"], row["behavior"], row["tjbid"]]
+                  row["filled_user_id"], row["behavior"], row["ptm_id"]]
         if row["behavior"] == "V":
             output += [row["item_id"], "0", "0", "0"]
             output_a_row(out_f, output)
@@ -207,7 +207,7 @@ def load_backfilled_raw_logs(work_dir, client):
                      "order_id STRING, "
                      "filled_user_id STRING, "
                      "behavior STRING, "
-                     "tjbid STRING, "
+                     "ptm_id STRING, "
                      "item_id STRING,"
                      "price FLOAT, "
                      "amount INT, "
@@ -323,7 +323,7 @@ def calc_order_items_with_rec_info(site_id, connection, client):
     #                  "uniq_order_id STRING, "
     #                  "order_id STRING, "
     #                  "user_id STRING, "
-    #                  "tjbid STRING, "
+    #                  "ptm_id STRING, "
     #                  "item_id STRING,"
     #                  "price FLOAT, "
     #                  "amount INT"
@@ -334,10 +334,10 @@ def calc_order_items_with_rec_info(site_id, connection, client):
 
     # client.execute("INSERT OVERWRITE TABLE order_items "
     #                "  SELECT a.date_str, a.hour, a.uniq_order_id, a.order_id, a.filled_user_id as user_id, "
-    #                "         a.tjbid, a.item_id, a.price, a.amount "
+    #                "         a.ptm_id, a.item_id, a.price, a.amount "
     #                "  FROM "
     #                "   (SELECT DISTINCT brl.date_str, brl.hour, brl.uniq_order_id, brl.order_id, brl.filled_user_id, "
-    #                "    brl.tjbid, brl.item_id, brl.price, brl.amount "
+    #                "    brl.ptm_id, brl.item_id, brl.price, brl.amount "
     #                "    FROM rec_buy rb1 "
     #                "    RIGHT OUTER JOIN backfilled_raw_logs brl ON (rb1.uniq_order_id = brl.uniq_order_id AND rb1.item_id = brl.item_id) "
     #                "    WHERE brl.behavior = 'PLO' "
@@ -359,7 +359,7 @@ def calc_order_items_with_rec_info(site_id, connection, client):
                      "uniq_order_id STRING, "
                      "order_id STRING, "
                      "user_id STRING, "
-                     "tjbid STRING, "
+                     "ptm_id STRING, "
                      "item_id STRING,"
                      "price FLOAT, "
                      "amount INT, "
@@ -376,7 +376,7 @@ def calc_order_items_with_rec_info(site_id, connection, client):
 
     client.execute("INSERT OVERWRITE TABLE order_items_with_rec_info "
                    "  SELECT oi.created_on, oi.date_str, oi.hour, "
-                   "         oi.uniq_order_id, oi.order_id, oi.user_id, oi.tjbid, "
+                   "         oi.uniq_order_id, oi.order_id, oi.user_id, oi.ptm_id, "
                    "         oi.item_id, oi.price, oi.amount, "
                    "         rl.item_id AS src_item_id, "
                    "         rl.behavior AS src_behavior, "
@@ -386,7 +386,7 @@ def calc_order_items_with_rec_info(site_id, connection, client):
                    "         rl.behavior IS NOT NULL "
                    "  FROM "
                    "   (SELECT DISTINCT brl.created_on, brl.date_str, brl.hour, brl.uniq_order_id, brl.order_id, brl.filled_user_id as user_id, "
-                   "    brl.tjbid, brl.item_id, brl.price, brl.amount "
+                   "    brl.ptm_id, brl.item_id, brl.price, brl.amount "
                    "    FROM rec_buy rb1 "
                    "    RIGHT OUTER JOIN backfilled_raw_logs brl ON (rb1.uniq_order_id = brl.uniq_order_id AND rb1.item_id = brl.item_id) "
                    "    WHERE brl.behavior = 'PLO' "
@@ -501,7 +501,7 @@ def calc_pvs(site_id, connection, client):
 
 @log_function
 def calc_uv_v(site_id, connection, client):
-    client.execute("SELECT date_str, COUNT(DISTINCT tjbid) "
+    client.execute("SELECT date_str, COUNT(DISTINCT ptm_id) "
                    "FROM backfilled_raw_logs brl "
                    "WHERE behavior='V'"
                    "GROUP BY date_str, behavior ")
@@ -557,7 +557,7 @@ def calc_daily_item_pv_coverage(client):
                      "count INT ) ")
     client.execute("INSERT OVERWRITE TABLE daily_item_pv_coverage_no_zero "
                     "SELECT a.behavior, a.datestr, a.item_id, count(*) AS count FROM "
-                       "(SELECT TRANSFORM (created_on, filled_user_id, behavior, tjbid, item_id) "
+                       "(SELECT TRANSFORM (created_on, filled_user_id, behavior, ptm_id, item_id) "
                            "USING 'python as_behavior_datestr_item_id.py' "
                            "AS (behavior, datestr, item_id) "
                            "FROM backfilled_raw_logs) a "
