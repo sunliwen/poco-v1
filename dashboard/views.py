@@ -200,7 +200,8 @@ def _calc_rec_deltas(row):
     else:
         row["avg_order_total_rec_delta"] = None
 
-    if row["total_sales"] is not None and row["total_sales_no_rec"] is not None:
+    if row["total_sales"] is not None and row["total_sales_no_rec"] is not None \
+      and row["total_sales"] != 0 and row["total_sales_no_rec"] != 0:
         row["total_sales_rec_delta"] = row["total_sales"] - row["total_sales_no_rec"]
         row["total_sales_rec_delta_ratio"] = row["total_sales_rec_delta"] / row["total_sales"]
         convertColumn(row, "total_sales_rec_delta_ratio")
@@ -324,8 +325,8 @@ def getItemsAndCount2(connection, site_id, page_num, page_size, search_name):
                 'item_id': item['item_id'],
                 'item_name': item['item_name'],
                 'market_price': item.get('market_price',''),
-                'price': item['price'],
-                'image_link': item['image_link']
+                'price': item.get('price', ''),
+                'image_link': item.get('image_link', '')
                 }
         #del item['_id']
         #item['created_on'] = item['created_on'].strftime("%Y-%m-%d %H:%m:%S")
@@ -769,14 +770,15 @@ def ajax_item(request, api_key, item_id):
     black_list = itemInfoListFromItemIdList(site['site_id'], mongo_client.get_black_list(site['site_id'], item_id))
     for black_item in black_list:
         black_item['is_black'] = True
+    item_categories = ",".join([category["id"] for category in item["categories"]])
     data = {
             'item_id': item['item_id'],
             'item_name': item['item_name'],
             'item_link': item['item_link'],
-            'item_categories': ",".join(item['categories']),
+            'item_categories': item_categories,
             'market_price': item.get('market_price', ''),
             'price': item.get('price', ''),
-            'image_link': item['image_link'],
+            'image_link': item.get('image_link', ''),
             'available': item['available'],
             'rec_lists':{
                 "also_viewed": _getTopnByAPI(site, "getAlsoViewed", item_id, 15),

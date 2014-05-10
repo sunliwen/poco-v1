@@ -14,3 +14,4 @@ EMAIL_HOST_PASSWORD = '<your password>' # Hint: you may use 2-step authenticatio
 
 # EDM sender email
 edm_sender_email = '<the sender appear on edm emails>'
+
