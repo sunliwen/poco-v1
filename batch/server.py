@@ -654,8 +654,8 @@ def workOnSiteWithRetries(site, is_manual_calculation=False, max_attempts=2):
 
 if __name__ == "__main__":
     while True:
-        site_ids = ["test_with_gdian_data"]
-        for site in loadSites(connection, site_ids=site_ids):
+        #site_ids = ["test_with_gdian_data"]
+        for site in loadSites(connection):
             for site in getManualCalculationSites():
                 workOnSiteWithRetries(site, is_manual_calculation=True)
             workOnSiteWithRetries(site)
