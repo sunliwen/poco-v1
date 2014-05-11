@@ -693,7 +693,7 @@ def ajax_report(request):
             else:
                 row["avg_order_total_rec_delta"] = None
         
-            if row.has_key("total_sales") and row["total_sales"] is not None and row["total_sales_no_rec"] is not None:
+            if row.has_key("total_sales") and row["total_sales"] is not None and row["total_sales"] != 0 and row["total_sales_no_rec"] is not None:
                 row["total_sales_rec_delta"] = row["total_sales"] - row["total_sales_no_rec"]
                 row["total_sales_rec_delta_ratio"] = row["total_sales_rec_delta"] / row["total_sales"]
                 convertColumn(row, "total_sales_rec_delta_ratio")

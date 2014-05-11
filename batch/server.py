@@ -576,9 +576,12 @@ def is_time_okay_for_automatic_calculation():
     return now.hour >= 0 and now.hour < 6
 
 
-def loadSites(connection):
+def loadSites(connection, site_ids=None):
     c_sites = connection["tjb-db"]["sites"]
-    return [site for site in c_sites.find({'available': 'on'})]
+    if site_ids:
+        return [site for site in c_sites.find({'available': 'on'}) if site["site_id"] in site_ids]
+    else:
+        return [site for site in c_sites.find({'available': 'on'})]
 
 
 def workOnSite(site, is_manual_calculation=False):
@@ -651,7 +654,8 @@ def workOnSiteWithRetries(site, is_manual_calculation=False, max_attempts=2):
 
 if __name__ == "__main__":
     while True:
-        for site in loadSites(connection):
+        site_ids = ["test_with_gdian_data"]
+        for site in loadSites(connection, site_ids=site_ids):
             for site in getManualCalculationSites():
                 workOnSiteWithRetries(site, is_manual_calculation=True)
             workOnSiteWithRetries(site)
